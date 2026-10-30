@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Método de Newton-Raphson: laboratorio interactivo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+  <header>
+    <h1>Método de Newton-Raphson</h1>
+    <p>Aprende cómo una tangente nos ayuda a encontrar ceros de una función.</p>
+  </header>
+
+  <main id="main">
+    <section class="panel" aria-labelledby="t-lab">
+      <h2 id="t-lab">Laboratorio interactivo</h2>
+      <div class="lab">
+        <div class="viz">
+          <svg id="lienzo" viewBox="0 0 640 400" role="img" aria-labelledby="svgT svgD">
+            <title id="svgT">Gráfica de la función con la tangente de Newton-Raphson</title>
+            <desc id="svgD">Aún no hay iteraciones.</desc>
+            <defs>
+              <clipPath id="clipPlot"><rect x="48" y="14" width="578" height="356"></rect></clipPath>
+            </defs>
+            <g id="capaEst"></g>
+            <g id="capaDin" clip-path="url(#clipPlot)"></g>
+          </svg>
+          <p class="peq">Consejo: haz clic en la gráfica para elegir x₀ (o usa el deslizador).</p>
+
+          <div class="controles">
+            <div class="campo">
+              <label for="funcion">Función</label>
+              <select id="funcion"></select>
+            </div>
+            <p id="nota" class="nota"></p>
+            <div class="campo">
+              <label for="x0">Valor inicial x₀ = <output id="x0Val" for="x0"></output></label>
+              <input type="range" id="x0" step="0.1" min="-1" max="4" value="3">
+            </div>
+            <div class="campo">
+              <label for="vel">Velocidad: <output id="velVal" for="vel"></output></label>
+              <input type="range" id="vel" min="0.2" max="2" step="0.1" value="0.6">
+            </div>
+            <div class="botones" role="group" aria-label="Controles de la animación">
+              <button id="btnPlay" type="button">▶ Reproducir</button>
+              <button id="btnPaso" type="button">Paso ›</button>
+              <button id="btnReset" type="button">↺ Reiniciar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="datos">
+          <h3>Estado</h3>
+          <p id="estado" role="status" aria-live="polite"></p>
+          <div class="tabla-wrap" tabindex="0" role="region" aria-label="Tabla de iteraciones, con desplazamiento">
+            <table id="tabla">
+              <caption>Iteraciones calculadas</caption>
+              <thead>
+                <tr>
+                  <th scope="col">n</th>
+                  <th scope="col">x<sub>n</sub></th>
+                  <th scope="col">f(x<sub>n</sub>)</th>
+                  <th scope="col">f′(x<sub>n</sub>)</th>
+                  <th scope="col">x<sub>n+1</sub></th>
+                  <th scope="col">|x<sub>n+1</sub> − x<sub>n</sub>|</th>
+                  <th scope="col">Error |x<sub>n+1</sub> − r|</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="peq">El <strong>error absoluto</strong> es la distancia entre la aproximación y la raíz r. Aquí r es el valor al que converge la sucesión, calculado en JavaScript con más iteraciones. Si la sucesión no converge, se muestra «—».</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="t-teo">
+      <h2 id="t-teo">¿Cómo funciona?</h2>
+      <ol class="pasos">
+        <li><strong>Objetivo:</strong> encontrar un número r tal que f(r) = 0 (una raíz).</li>
+        <li><strong>Adivinanza inicial:</strong> elegimos x₀ cerca de la raíz.</li>
+        <li><strong>Tangente:</strong> en el punto (xₙ, f(xₙ)) dibujamos la recta tangente a la curva. Su ecuación es y = f(xₙ) + f′(xₙ)·(x − xₙ).</li>
+        <li><strong>Corte con el eje x:</strong> hacemos y = 0 y despejamos. Ese corte es la nueva aproximación:
+          <p class="formula">xₙ₊₁ = xₙ − f(xₙ) / f′(xₙ)</p></li>
+        <li><strong>Repetir:</strong> cada iteración suele acercarse mucho más a la raíz. Cuando está cerca, el número de cifras correctas casi se duplica en cada paso.</li>
+      </ol>
+      <h3>¿Cuándo puede fallar?</h3>
+      <ul>
+        <li>Si f′(xₙ) = 0, la tangente es horizontal y nunca corta el eje x.</li>
+        <li>Si x₀ está lejos de la raíz, la sucesión puede alejarse o ir hacia otra raíz.</li>
+        <li>Puede entrar en un ciclo. Prueba f(x) = x³ − 2x + 2 con x₀ = 0.</li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="t-ej">
+      <h2 id="t-ej">Ejemplo resuelto</h2>
+      <div id="ejemplo"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="t-ver">
+      <h2 id="t-ver">Comprueba lo aprendido</h2>
+
+      <form id="formNum" novalidate>
+        <h3>Pregunta 1 (cálculo)</h3>
+        <p id="enunciado"></p>
+        <div class="campo fila">
+          <label for="resp">Tu respuesta para x₁:</label>
+          <input type="text" id="resp" inputmode="decimal" autocomplete="off">
+        </div>
+        <div class="botones">
+          <button type="submit">Comprobar</button>
+          <button type="button" id="btnSol">Mostrar solución</button>
+          <button type="button" id="btnVer">Ver en la animación</button>
+          <button type="button" id="btnNueva">Nueva pregunta</button>
+        </div>
+        <p id="fbNum" role="status" aria-live="polite" class="fb"></p>
+      </form>
+
+      <form id="formCon" novalidate>
+        <fieldset>
+          <legend>Pregunta 2 (concepto): si en una iteración f′(xₙ) = 0, ¿qué ocurre?</legend>
+          <label class="opc"><input type="radio" name="c" value="a"> La tangente es horizontal y no corta el eje x, así que no se puede calcular xₙ₊₁.</label>
+          <label class="opc"><input type="radio" name="c" value="b"> Se obtiene xₙ₊₁ = xₙ y el método ya terminó con la raíz exacta.</label>
+          <label class="opc"><input type="radio" name="c" value="c"> El método converge más rápido que nunca.</label>
+        </fieldset>
+        <div class="botones"><button type="submit">Comprobar</button></div>
+        <p id="fbCon" role="status" aria-live="polite" class="fb"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer><p>Todos los cálculos se realizan en tu navegador. No se usan servicios externos.</p></footer>
+  <script src="app.js" defer></script>
+</body>
+</html>
